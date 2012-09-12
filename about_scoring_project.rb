@@ -31,13 +31,33 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 
 def score(dice)
   # You need to write this method
+  score = 0
+
+  if dice.count == 0
+    return score
+  end
+  
+  set_of_three_ones = dice.find_all{|ones| ones == 1}
+  if set_of_three_ones == [1, 1, 1]
+    score = score + 1000
+  end
+
+  dice.each do |item|
+    set_of_three = dice.find_all{|match| match == item}
+    if set_of_three.count == 3
+      number = set_of_three[0].to_i 
+      score = score + number * 100
+    end
+  end
+
+
 end
 
 class AboutScoringProject < EdgeCase::Koan
   def test_score_of_an_empty_list_is_zero
     assert_equal 0, score([])
   end
-
+  
   def test_score_of_a_single_roll_of_5_is_50
     assert_equal 50, score([5])
   end
