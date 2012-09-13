@@ -32,6 +32,7 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 def score(dice)
   # You need to write this method
   score = 0
+  number = 0
 
   if dice.count == 0
     return score
@@ -40,17 +41,31 @@ def score(dice)
   set_of_three_ones = dice.find_all{|ones| ones == 1}
   if set_of_three_ones == [1, 1, 1]
     score = score + 1000
-  end
-
-  dice.each do |item|
-    set_of_three = dice.find_all{|match| match == item}
-    if set_of_three.count == 3
-      number = set_of_three[0].to_i 
-      score = score + number * 100
+  else
+    matches = dice.group_by{|i| i}
+    matches.each_pair do |n, matching_die|
+      if matching_die.size >= 3
+        score = score + (n * 100)
+      end
+      if n == 5 && matching_die.size > 3
+      end
     end
   end
-
-
+  fives = dice.find_all{|fives| fives == 5}
+  if fives.size > 0 
+    amount_of_fives = fives.size
+    if fives.size >= 3
+      score = score + ((amount_of_fives - 3) * 50)
+    else
+      score = score + (amount_of_fives * 50)
+    end
+  end
+    ones = dice.find_all{|ones| ones == 1}
+  if ones.size > 0 && ones.size < 3
+    amount_of_ones = ones.size
+    score = score + (amount_of_ones * 100)
+  end
+  return score
 end
 
 class AboutScoringProject < EdgeCase::Koan
@@ -58,6 +73,7 @@ class AboutScoringProject < EdgeCase::Koan
     assert_equal 0, score([])
   end
   
+
   def test_score_of_a_single_roll_of_5_is_50
     assert_equal 50, score([5])
   end
